@@ -1,22 +1,26 @@
 // Use Express
 var express = require("express");
+const app = express()
 // Use body-parser
 var bodyParser = require("body-parser");
 const session = require('express-session')
 const mongoose = require('mongoose')
 
-
+app.use(session({
+    secret: 'hethjkerogouergouergoergroeg',
+    saveUnintialized: false,
+    resave: false
+}))
 
 
 mongoose.Promise = Promise
 mongoose.connect('mongodb://localhost:27017/assignment')
 .then(() => console.log("Mongoose up"))
 
-// const User = require('./models/users')
+const User = require('./schemas/User')
 
 
 // Create new instance of the express server
-var app = express();
 
 // Define the JSON parser as a default way 
 // to consume and produce data through the 
@@ -30,11 +34,7 @@ app.use(bodyParser.json());
 // var distDir = __dirname + "/dist/";
 // app.use(express.static(distDir));
 
-app.use(session({
-    secret: 'hello',
-    saveUnintialized: false,
-    resave: false
-}))
+
 
 // Local port.
 app.listen(8080, () => console.log("Server listening at 8080"))
@@ -55,15 +55,6 @@ const path = require('path');
  */
 app.post("/api/login", async (req, res)=> {
     const {email, password} = req.body
-    const existingUser = await User.findOne({email})
-
-    if(existingUser){
-        res.json({
-            success: false,
-            message: "email already in use"
-        })
-        req.session.user = email
-    }
 
     const resp = await User.findOne({email, password})
     if(!resp){
@@ -72,10 +63,15 @@ app.post("/api/login", async (req, res)=> {
             success: false,
             message : "Incorrect details"
         })
-        // login is incorrect
-    } else {
-        // make a session
+    }else{
+        res.json({
+            success : true
+        })
+        req.session.user = email
+        console.log("Logging you in")
     }
+        // login is incorrect
+        // make a session
 });
 
 
@@ -85,13 +81,26 @@ app.post("/api/login", async (req, res)=> {
 
 app.post("/api/register", async (req, res) =>{
     console.log(req.body)
-    const {username, password} = res.body
+
+
+    const {email, password} = req.body
+    const existingUser = await User.findOne({email})
+    console.log(existingUser, email, password)
+
+    if(existingUser){
+        res.json({
+            success: false,
+            message: "Email already in use"
+        })
+        return
+    }
     const user = new User({
         email,
         password
     })
 
     const result = await user.save()
+    console.log("Saved in DB")
     res.json(result)
     res.json({
         success: true,
@@ -104,8 +113,7 @@ app.post("/api/register", async (req, res) =>{
 });
 
 app.get('/api/data', async (req, res) => {
-    const user = await User.findOne({email: req.session.email})
-    
+    const user = await User.findOne({email : req.session.email})
     if(!user){
         res.json({
             status: false,
@@ -113,10 +121,11 @@ app.get('/api/data', async (req, res) => {
         })
         return
     }
-    
+    console.log("hello world")
     res.json({
-        'email': req.session.user,
-        'rank' : user.rank
+        status: true,
+        email: req.session.email,
+        rank : user.rank
     })
 });
 

@@ -14,6 +14,7 @@ import { LogoutComponent } from './logout/logout.component';
 import { RegisterComponent } from './register/register.component';
 import { HomeComponent } from './home/home.component';
 import { Router, RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { Router, RouterModule } from '@angular/router';
     ReactiveFormsModule,
     FormsModule,
     RouterModule,
+    HttpClientModule,
   ],
   providers: [AuthGuard, AuthService, UserService],
   bootstrap: [AppComponent]

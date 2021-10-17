@@ -9,7 +9,7 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  constructor(private router: Router, private Auth: AuthService, private activatedRoute: ActivatedRoute) { }
+  constructor(private router: Router, private Auth: AuthService) { }
 
   ngOnInit(): void {
   }
